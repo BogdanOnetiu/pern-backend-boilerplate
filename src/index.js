@@ -1,22 +1,25 @@
-require('dotenv').config(/*Env file location*/); 
-const express = require('express');
-const eventRoutes = require('./routes/eventRoutes');
-const myDataSource = require('./config/database');
+import cors from "cors";
+import express from "express";
+import dotenv from "dotenv";
 
-myDataSource
-  .initialize()
-  .then(async () => {
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Error during Data Source initialization:", err)
-  })
+dotenv.config();
 
 const app = express();
-app.use(express.json());
+const PORT = process.env.PORT || 8000;
 
-const port = 3001;
+app.use(cors("*"));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true }));
 
-app.use('/users', eventRoutes);
+//app.use("/api-v1", routes);
+
+app.use("*", (req, res) => {
+  res.status(404).json({
+    status: "404 Not found",
+    message: "Route not found",
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`);
+});
